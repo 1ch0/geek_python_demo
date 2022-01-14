@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="124.223.36.219" id="647f2030-ecc9-4577-be4b-8cad854dc774" keyPath="E:\DEV\key\TX" port="22" customName="Tencent_SH" nameFormat="CUSTOM" username="root" useOpenSSHConfig="true">
+        <option name="customName" value="Tencent_SH" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

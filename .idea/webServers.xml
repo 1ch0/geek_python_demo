@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="21930cdd-692c-4534-8c5f-205263b57d25" name="tencent_sh">
+        <fileTransfer rootFolder="/root/workspace/python" accessType="SFTP" host="124.223.36.219" port="22" sshConfigId="647f2030-ecc9-4577-be4b-8cad854dc774" sshConfig="Tencent_SH" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
