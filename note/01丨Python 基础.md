@@ -268,3 +268,40 @@ print('The price of product 432314553 is {}'.format(products[432314553]))
 
 - 除了使用加法操作符，我们还可以使用字符串内置的 join 函数。string.join(iterable)，表示把每个元素都按照指定的格式连接起来
 
+- 常见的函数还有：
+
+  - string.strip(str)，表示去掉首尾的 str 字符串；
+  - string.lstrip(str)，表示只去掉开头的 str 字符串；
+  - string.rstrip(str)，表示只去掉尾部的 str 字符串。
+  - 从文件读进来的字符串中，开头和结尾都含有空字符，我们需要去掉它们，就可以用 strip() 函数
+  - Python 中字符串还有很多常用操作，比如，string.find(sub, start, end)，表示从start 到 end 查找字符串中子字符串 sub 的位置
+
+### 3.3 格式化
+
+- 使用一个字符串作为模板，模板中会有格式符。这些格式符为后续真实值预留位置，以呈现出真实值应该呈现的格式。字符串的格式化，通常会用在程序的输出、logging等场景。
+
+  ```python
+  print('no data available for person with id: {}, name: {}'.format(id, name))
+  ```
+
+  其中的 string.format()，就是所谓的格式化函数；而大括号{}就是所谓的格式符，用来为后面的真实值——变量 name 预留位置
+
+- string.format() 是最新的字符串格式函数与规范。自然，我们还有其他的表示方法，比如在 Python 之前版本中，字符串格式化通常用 % 来表示
+
+  ```python
+  print('no data available for person with id: %s, name: %s' % (id, name))
+  ```
+
+  其中 %s 表示字符串型，%d 表示整型等等，这些属于常识
+
+  推荐使用 format 函数，毕竟这是最新规范，也是官方文档推荐的规范。
+
+- 使用格式化函数，更加清晰、易读，并且更加规范，不易出错。
+
+```ad_summary
+Python 中字符串使用单引号、双引号或三引号表示，三者意义相同，并没有什么区别。其中，三引号的字符串通常用在多行字符串的场景。
+Python 中字符串是不可变的（前面所讲的新版本 Python 中拼接操作’+='是个例外）。因此，随意改变字符串中字符的值，是不被允许的。
+Python 新版本（2.5+）中，字符串的拼接变得比以前高效了许多，你可以放心使用。
+Python 中字符串的格式化（string.format）常常用在输出、日志的记录等场景。
+```
+
