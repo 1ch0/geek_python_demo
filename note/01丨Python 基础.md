@@ -749,3 +749,346 @@ else:
 
 ## 7. 自定义函数
 
+### 7.1 函数基础
+
+- 函数就是为了实现某一功能的代码段，只要写好以后，就可以重复利用
+
+  ```python
+  def my_func(message):
+      print('Got a message: {}'.format(message))
+  my_func('Hello')
+  ```
+
+  def 是函数的声明；
+  my_func 是函数的名称；
+  括号里面的 message 则是函数的参数；
+  而 print 那行则是函数的主体部分，可以执行相应的语句；
+  在函数最后，你可以返回调用结果（return 或 yield），也可以不返回。
+
+  ```python
+  def name(param1, param2, ..., paramN):
+  	statements
+  	return/yield value # optional
+  ```
+
+- 和其他需要编译的语言（比如 C 语言）不一样的是，def 是可执行语句，这意味着函数直到被调用前，都是不存在的。当程序调用函数时，def 语句才会创建一个新的函数对象，并赋予其名字。
+
+- 主程序调用函数时，必须保证这个函数此前已经定义过，不然就会报错
+
+- 但是，如果我们在函数内部调用其他函数，函数间哪个声明在前、哪个在后就无所谓，因为def 是可执行语句，函数在调用之前都不存在，我们只需保证调用时，所需的函数都已经声明定义
+
+  ```python
+  def my_func(message):
+  	my_sub_func(message) # 调用 my_sub_func() 在其声明之前不影响程序执行
+  def my_sub_func(message):
+  	print('Got a message: {}'.format(message))
+  my_func('hello world')
+  ```
+  
+- Python 函数的参数可以设定默认值
+  
+  ```python
+  def func(param = 0):
+  	...
+  ```
+
+  在调用函数 func() 时，如果参数 param 没有传入，则参数默认为 0；而如果传入了参数 param，其就会覆盖默认值。
+  
+- **Python 是 dynamically typed 的，可以接受任何数据类型（整型，浮点，字符串等等）**
+
+- Python 不用考虑输入的数据类型，而是将其交给具体的代码去判断执行，同样的一个函数（比如这边的相加函数 my_sum()），可以同时应用在整型、列表、字符串等等的操作中。
+
+- **多态**，必要时请你在开头加上数据的类型检查
+
+- Python 支持函数的嵌套。所谓的函数嵌套，就是指函数里面又有函数，比如：
+
+  ```python
+  def f1():
+  	print('hello')
+  	def f2():
+  		print('world')
+  	f2()
+  f1()
+  ```
+
+- 函数嵌套
+
+  - 第一，函数的嵌套能够保证内部函数的隐私。内部函数只能被外部函数所调用和访问，不会暴露在全局作用域，因此，如果你的函数内部有一些隐私数据（比如数据库的用户、密码等），不想暴露在外，那你就可以使用函数的的嵌套，将其封装在内部函数中，只通过外部函数来访问。
+
+    ```python
+    def connect_DB():
+    	def get_DB_configuration():
+    		...
+    		return host, username, password
+    	conn = connector.connect(get_DB_configuration())
+    	return conn
+    ```
+
+  - 第二，合理的使用函数嵌套，能够提高程序的运行效率
+
+    ```python
+    def factorial(input):
+    	# validation check
+    	if not isinstance(input, int):
+    		raise Exception('input must be an integer.')
+    	if input < 0:
+    		raise Exception('input must be greater or equal to 0' )
+    	...
+    
+        def inner_factorial(input):
+    		if input <= 1:
+    			return 1
+    		return input * inner_factorial(input-1)
+    	return inner_factorial(input)
+    
+    print(factorial(5))
+    ```
+
+### 7.2 函数变量作用域
+
+- Python 函数中变量的作用域和其他语言类似。如果变量是在函数内部定义的，就称为局部变量，只在函数内部有效。一旦函数执行完毕，局部变量就会被回收，无法访问
+
+- 全局变量则是定义在整个文件层次上的
+
+- **不能在函数内部随意改变全局变量的值**
+
+- Python 的解释器会默认函数内部的变量为局部变量，但是又发现局部变量MIN_VALUE 并没有声明，因此就无法执行相关操作。所以，如果我们一定要在函数内部改变全局变量的值，就必须加上 global 这个声明：
+
+  ```python
+  MIN_VALUE = 1
+  MAX_VALUE = 10
+  def validation_check(value):
+  	global MIN_VALUE
+  	...
+  	MIN_VALUE += 1
+  	...
+  validation_check(5)
+  ```
+
+  这里的 global 关键字，并不表示重新创建了一个全局变量 MIN_VALUE，而是告诉Python 解释器，函数内部的变量 MIN_VALUE，就是之前定义的全局变量，并不是新的全局变量，也不是局部变量。这样，程序就可以在函数内部访问全局变量，并修改它的值了。
+
+- 如果遇到函数内部局部变量和全局变量同名的情况，那么在函数内部，局部变量会覆盖全局变量，比如下面这种
+
+  ```python
+  MIN_VALUE = 1
+  MAX_VALUE = 10
+  def validation_check(value):
+  	MIN_VALUE = 3
+  	...
+  ```
+
+- 对于嵌套函数来说，内部函数可以访问外部函数定义的变量，但是无法修改，若要修改，必须加上 **nonlocal** 这个关键字
+
+  ```python
+  def outer():
+  	x = "local"
+  	def inner():
+  		nonlocal x # nonlocal 关键字表示这里的 x 就是外部函数 outer 定义的变量 x
+  		x = 'nonlocal'
+  		print("inner:", x)
+  	inner()
+  	print("outer:", x)
+  outer()
+  ```
+
+- 如果不加上 nonlocal 这个关键字，而内部函数的变量又和外部函数变量同名，那么同样的，内部函数变量会覆盖外部函数的变量。
+
+  ```python
+  def outer():
+  	x = "local"
+  	def inner():
+  		x = 'nonlocal' # 这里的 x 是 inner 这个函数的局部变量
+  		print("inner:", x)
+  	inner()
+  	print("outer:", x)
+  outer()	
+  ```
+
+### 7.3 闭包
+
+- 闭包其实和刚刚讲的嵌套函数类似，不同的是，这里外部函数返回的是一个函数，而不是一个具体的值。返回的函数通常赋于一个变量，这个变量可以在后面被继续执行调用。
+
+  计算一个数的 n 次幂
+
+  ```python
+  def nth_power(exponent):
+  	def exponent_of(base):
+  		return base ** exponent
+  	return exponent_of # 返回值是 exponent_of 函数
+  square = nth_power(2) # 计算一个数的平方
+  cube = nth_power(3) # 计算一个数的立方
+  square
+  cube
+  print(square(2)) # 计算 2 的平方
+  print(cube(2)) # 计算 2 的立方
+  ```
+
+  这里外部函数 nth_power() 返回值，是函数 exponent_of()，而不是一个具体的数值。需要注意的是，在执行完square = nth_power(2)和cube = nth_power(3)后，外部函数 nth_power() 的参数 exponent，仍然会被内部函数 exponent_of() 记住。这样，之后我们调用 square(2) 或者 cube(2) 时，程序就能顺利地输出结果，而不会报错说参数exponent 没有定义了。
+
+- **使用闭包的一个原因，是让程序变得更简洁易读**
+
+```ad-summary
+1. Python 中函数的参数可以接受任意的数据类型，使用起来需要注意，必要时请在函数开头加入数据类型的检查；
+2. 和其他语言不同，Python 中函数的参数可以设定默认值；
+3. 嵌套函数的使用，能保证数据的隐私性，提高程序运行效率；
+4. 合理地使用闭包，则可以简化程序的复杂度，提高可读性。
+```
+
+## 8. 匿名函数
+
+### 8.1 基础
+
+- 匿名函数的格式：`lambda argument1, argument2,... argumentN : expression`
+
+- 匿名函数的关键字是 lambda，之后是一系列的参数，然后用冒号隔开，最后则是由这些参数组成的表达式
+
+  ```python
+  square = lambda x: x**2
+  square(3)
+  ```
+  
+- 与常规函数区别
+  
+  - 第一，lambda 是一个表达式（expression），并不是一个语句（statement）。lambda 可以用在一些常规函数 def 不能用的地方，比如，lambda 可以用在列表内部，而常规函数却不能
+  
+    ```python
+    [(lambda x: x*x)(x) for x in range(10)]
+    ```
+  
+    lambda 可以被用作某些函数的参数，而常规函数 def 也不能
+  
+    ```python
+    l = [(1, 20), (3, 0), (9, 10), (2, -1)]
+    l.sort(key=lambda x: x[1]) # 按列表中元祖的第二个元素排序
+    print(l)
+    ```
+  
+    常规函数 def 必须通过其函数名被调用，因此必须首先被定义。但是作为一个表达式的
+    lambda，返回的函数对象就不需要名字了。
+  
+  - 第二，lambda 的主体是只有一行的简单表达式，并不能扩展成一个多行的代码块。
+  
+    这其实是出于设计的考虑。Python 之所以发明 lambda，就是为了让它和常规函数各司其职：lambda 专注于简单的任务，而常规函数则负责更复杂的多行逻辑
+  
+### 8.2 为什么使用匿名函数 
+
+- 使用匿名函数 lambda，可以帮助我们大大简化代码的复杂度，提高代码的可读性。
+
+### 8.3 函数式编程
+
+- 函数式编程，是指代码中每一块都是不可变的（immutable），都由纯函数（purefunction）的形式组成。这里的纯函数，是指函数本身相互独立、互不影响，对于相同的输入，总会有相同的输出，没有任何副作用。
+
+- 函数式编程的优点，主要在于其纯函数和不可变的特性使程序更加健壮，易于调试（debug）和测试；缺点主要在于限制多，难写。
+
+- map(function, iterable) 函数
+
+  - 对 iterable 中的每个元素，都运用 function 这个函数，最后返回一个新的可遍历的集合。
+
+    要对列表中的每个元素乘以 2，那么用 map 就可以表示为下面这样
+
+    ```python
+    l = [1, 2, 3, 4, 5]
+    new_list = map(lambda x: x * 2, l) # [2， 4， 6， 8， 10]
+    ```
+
+    我们可以以 map() 函数为例，看一下 Python 提供的函数式编程接口的性能。还是同样的列表例子，它还可以用 for 循环和 list comprehension（目前没有统一中文叫法，你也可以直译为列表理解等）实现，我们来比较一下它们的速度：
+
+    ```shell
+    python3 -mtimeit -s'xs=range(1000000)' 'map(lambda x: x*2, xs)'
+    
+    python3 -mtimeit -s'xs=range(1000000)' '[x * 2 for x in xs]'
+    
+    python3 -mtimeit -s'xs=range(1000000)' 'l = []' 'for i in xs: l.append(i * 2)'
+    ```
+
+    **map() 是最快的。因为 map() 函数直接由 C 语言写的，运行时不需要通过Python 解释器间接调用，并且内部做了诸多优化，所以运行速度最快。**
+
+- filter(function, iterable) 函数
+
+  - 它和 map 函数类似，function 同样表示一个函数对象。filter() 函数表示对 iterable 中的每个元素，都使用 function 判断，并返回True 或者 False，最后将返回 True 的元素组成一个新的可遍历的集合。
+
+    返回一个列表中的所有偶数，可以写成下面这样
+
+    ```python
+    l = [1, 2, 3, 4, 5]
+    new_list = filter(lambda x: x % 2 == 0, l) # [2, 4]
+    ```
+
+- reduce(function, iterable) 函数
+
+  - function 同样是一个函数对象，规定它有两个参数，表示对 iterable 中的每个元素以及上一次调用后的结果，运用 function 进行计算，所以最后返回的是一个单独的数值。
+
+    ```python
+    l = [1, 2, 3, 4, 5]
+    product = reduce(lambda x, y: x * y, l) # 1*2*3*4*5 = 120
+    ```
+    
+```ad-summary
+匿名函数 lambda，它的主要用途是减少代码的复杂度。需要注意的是 lambda 是一个表达式，并不是一个语句；它只能写成一行的表达形式，语法上并不支持多行。匿名函数通常的使用场景是：程序中需要使用一个函数完成一个
+简单的功能，并且该函数只调用一次。
+Python 的函数式编程，主要了解了常见的 map()，fiilter() 和reduce() 三个函数，并比较了它们与其他形式（for 循环，comprehension）的性能，显然，它们的性能效率是最优的。
+```
+
+## 9. 面向对象
+
+### 9.1 基础
+
+- 基本概念
+  - 类，一群有着相同属性和函数的对象的集合。
+  - 对象：集合中的一个事物，这里对应由 class 生成的某一个 object。
+  - 属性：对象的某个静态特征。
+  - 函数：对象的某个动态能力。
+
+### 9.2 代码示例
+
+- 如何在一个类中定义一些常量，每个对象都可以方便访问这些常量而不用重新构造？
+
+  在 Python 的类里，你只需要和函数并列地声明并赋值，就可以实现这一点，例如这段代码中的 WELCOME_STR。一种很常规的做法，是用全大写来表示常量，因此我们可以在类中使用 self.WELCOME_STR ，或者在类外使用 Entity.WELCOME_STR ，来表达这个字符串。
+
+- 如果一个函数不涉及到访问修改这个类的属性，而放到类外面有点不恰当，怎么做才能更优雅呢？
+
+  提出了类函数、成员函数和静态函数三个概念。它们其实很好理解，前两者产生的影响是动态的，能够访问或者修改对象的属性；而静态函数则与类没有什么关联，最明显的特征便是，静态函数的第一个参数没有任何特殊性。
+
+  ```python
+  # 类函数
+  @classmethod
+  
+  # 静态函数
+  @staticmethod
+  ```
+
+  - 一般而言，静态函数可以用来做一些简单独立的任务，既方便测试，也能优化代码结构。静态函数还可以通过在函数前一行加上 @staticmethod 来表示
+
+  - 类函数的第一个参数一般为 cls，表示必须传一个类进来。类函数最常用的功能是实现不同的 init 构造函数,类函数需要装饰器 @classmethod 来声明
+  - 成员函数则是我们最正常的类的函数，它不需要任何装饰器声明，第一个参数 self 代表当前对象的引用，可以通过此函数，来实现想要的查询 / 修改类的属性等功能。
+
+- 既然类是一群相似的对象的集合，那么可不可以是一群相似的类的集合呢？
+
+### 9.3 继承
+
+- 类的继承，顾名思义，指的是一个类既拥有另一个类的特征，也拥有不同于另一个类的独特特征。在这里的第一个类叫做子类，另一个叫做父类，特征其实就是类的属性和函数。
+- 首先需要注意的是构造函数。每个类都有构造函数，继承类在生成对象的时候，是不会自动调用父类的构造函数的，因此你必须在 init() 函数中显式调用父类的构造函数。它们的执行顺序是 子类的构造函数 -> 父类的构造函数。
+- 减少重复的代码，降低系统的熵值（即复杂度）。
+- 抽象类是一种特殊的类，它生下来就是作为父类存在的，一旦对象化就会报错。同样，抽象函数定义在抽象类之中，子类必须重写该函数才能使用。相应的抽象函数，则是使用装饰器@abstractmethod 来表示。
+- **软件工程中一个很重要的概念，定义接口**
+- **抽象类就是这么一种存在，它是一种自上而下的设计风范，你只需要用少量的代码描述清楚要做的事情，定义好接口，然后就可以交给不同开发人员去开发和对接。**
+
+```ad-summary
+面向对象编程是软件工程中重要的思想。正如动态规划是算法中的重要思想一样，它不是某一种非常具体的技术，而是一种综合能力的体现，是将大型工程解耦化、模块化的重要方法。在实践中要多想，尤其是抽象地想，才能更快掌握这个技巧。
+```
+
+## 10. 面向对象 - 实现一个搜索引擎
+
+### 10.1 基础
+
+- 一个搜索引擎由搜索器、索引器、检索器和用户接口四个部分组成。
+- 搜索器，通俗来讲就是我们常提到的爬虫（scrawler），它能在互联网上大量爬取各类网站的内容，送给索引器。索引器拿到网页和内容后，会对内容进行处理，形成索引（index），存储于内部的数据库等待检索。
+
+### 10.2 Bag of Words 和 Inverted Index
+
+- BOW Model，即 [Bag of Words Model](https://en.wikipedia.org/wiki/Bag-of-words_model)，词袋模型
+
+
+
+
+
