@@ -494,6 +494,80 @@ def check(param1, param2, ...) # 检查用户设备类型，版本号
 装饰器通常运用在身份认证、日志记录、输入合理性检查以及缓存等多个领域中。合理使用装饰器，往往能极大地提高程序的可读性以及运行效率。
 ```
 
+## 4. metaclass
+
+- meta-class 的 meta 这个词根，起源于希腊语词汇 meta，包含下面两种意思：
+  - “Beyond”，例如技术词汇 metadata，意思是描述数据的超越数据；
+  - “Change”，例如技术词汇 metamorphosis，意思是改变的形态。
+
+- [YAML](https://pyyaml.org/wiki/PyYAMLDocumentation)是一个家喻户晓的 Python 工具，可以方便地序列化 / 逆序列化结构数据。YAMLObject 的一个**超越变形能力**，就是它的任意子类支持序列化和反序列化（serialization & deserialization）
+
+  ```python
+  ```
+
+## 5. 迭代器和生成器
+
+- 迭代器（iterator）提供了一个 next 的方法。调用这个方法后，你要么得到这个容器的下一个对象，要么得到一个 StopIteration 的错误
+
+  ```python
+  def is_iterable(param):
+      try: 
+          iter(param) 
+          return True
+      except TypeError:
+          return False
+   
+  params = [
+      1234,
+      '1234',
+      [1, 2, 3, 4],
+      set([1, 2, 3, 4]),
+      {1:1, 2:2, 3:3, 4:4},
+      (1, 2, 3, 4)
+  ]
+      
+  for param in params:
+      print('{} is iterable? {}'.format(param, is_iterable(param)))
+   
+  ########## 输出 ##########
+   
+  1234 is iterable? False
+  1234 is iterable? True
+  [1, 2, 3, 4] is iterable? True
+  {1, 2, 3, 4} is iterable? True
+  {1: 1, 2: 2, 3: 3, 4: 4} is iterable? True
+  (1, 2, 3, 4) is iterable? True
+  ```
+
+  **除了数字 1234 之外，其它的数据类型都是可迭代的。**
+
+- 生成器
+- **生成器是懒人版本的迭代器**
+- 迭代器是一个有限集合，生成器则可以成为一个无限集。我只管调用 next()，生成器根据运算会自动生成新的元素，然后返回给你，非常便捷。
+- 
+
+```ad-summary
+容器是可迭代对象，可迭代对象调用 iter() 函数，可以得到一个迭代器。迭代器可以通过 next() 函数来得到下一个元素，从而支持遍历。
+生成器是一种特殊的迭代器（注意这个逻辑关系反之不成立）。使用生成器，你可以写出来更加清晰的代码；合理使用生成器，可以降低内存占用、优化程序结构、提高程序速度。
+生成器在 Python 2 的版本上，是协程的一种重要实现方式；而 Python 3.5 引入 async await 语法糖后，生成器实现协程的方式就已经落后了。我们会在下节课，继续深入讲解 Python 协程。
+```
+
+## 6.  Python 协程
+
+### 6.1 执行协程常用的三种方法
+
+- 首先，我们可以通过 await 来调用。await 执行的效果，和 Python 正常执行是一样的，也就是说程序会阻塞在这里，进入被调用的协程函数，执行完毕返回后再继续，而这也是 await 的字面意思。代码中 `await asyncio.sleep(sleep_time)` 会在这里休息若干秒，`await crawl_page(url)` 则会执行 crawl_page() 函数。
+- 其次，我们可以通过 asyncio.create_task() 来创建任务，这个我们下节课会详细讲一下，你先简单知道即可。
+- 最后，我们需要 asyncio.run 来触发运行。asyncio.run 这个函数是 Python 3.7 之后才有的特性，可以让 Python 的协程接口变得非常简单，你不用去理会事件循环怎么定义和怎么使用的问题（我们会在下面讲）。一个非常好的编程规范是，asyncio.run(main()) 作为主程序的入口函数，在程序运行周期内，只调用一次 asyncio.run。
+
+```ad-summary
+协程和多线程的区别，主要在于两点，一是协程为单线程；二是协程由用户决定，在哪些地方交出控制权，切换到下一个任务。
+协程的写法更加简洁清晰，把 async / await 语法和 create_task 结合来用，对于中小级别的并发需求已经毫无压力。
+写协程程序的时候，你的脑海中要有清晰的事件循环概念，知道程序在什么时候需要暂停、等待 I/O，什么时候需要一并执行到底。
+```
+
+
+
 
 
 
