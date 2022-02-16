@@ -1,8 +1,8 @@
 ---
 author: 1ch0
 index_img: https://raw.githubusercontent.com/1ch0/Figure-bed/main/img/python-programming.jpg
-date: 2022-01-12-星期三 15:37
-update: 2022-01-12-Wednesday 15:40:37
+date: 2022-01-12 15:37
+update: 2022-01-30-Sunday 10:00:41
 tags: Python
 categories: Python
 hide: false
@@ -1141,7 +1141,7 @@ Python 的函数式编程，主要了解了常见的 map()，fiilter() 和reduce
 
   这样，每次你通过 activate 激活这个运行时环境的时候，它就会自动将项目的根目录添加到搜索路径中去。
 
-## 11.3 神奇的 if __name__ == '__main__'
+### 11.3 神奇的 if __name__ == '__main__'
 
 - Python 是脚本语言，和 C++、Java 最大的不同在于，不需要显式提供 main() 函数入口
 
